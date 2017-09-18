@@ -1,0 +1,48 @@
+import sublime
+import sublime_plugin
+import os
+import re
+import subprocess
+
+class TmuxCommand():
+    def resolve_file_path(self, path):
+        if path:
+            return path
+        elif self.window.active_view().file_name():
+            return re.sub(
+                re.compile('{0}[^{0}]+$'.format(os.sep)),
+                os.sep,
+                self.window.active_view().file_name()
+            )
+        elif self.window.folders():
+            return self.window.folders()[0]
+        else:
+            return None
+
+    def run_tmux(self, path, parameters, split):
+        try:
+            args = ['tmux', 'split-window' if split else 'new-window']
+
+            if split == 'horizontal':
+                args.append('-h')
+
+            if path:
+                args.extend(['-c', path])
+
+            args.extend(parameters)
+            subprocess.Popen(args)
+        except (Exception) as exception:
+            sublime.error_message('tmux: ' + str(exception))
+
+class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
+    def run(self, path=None, parameters=[], split=None):
+        path = self.resolve_file_path(path)
+
+        self.run_tmux(path, parameters, split)
+
+class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
+    def run(self, path=None, parameters=[], split=None):
+        path = self.resolve_file_path(path)
+        folders = [x for x in self.window.folders() if path.find(x + os.sep) == 0][0:1]
+
+        self.run_tmux(folders[0], parameters, split)

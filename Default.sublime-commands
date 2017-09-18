@@ -1,0 +1,24 @@
+[
+    {
+        "caption": "Tmux: Open here",
+        "command": "open_tmux"
+    },
+    {
+        "caption": "Tmux: Open project folder",
+        "command": "open_tmux_project_folder"
+    },
+    {
+        "caption": "Tmux: Open here (split vertically)",
+        "command": "open_tmux",
+        "args": {
+            "split": "vertical"
+        }
+    },
+    {
+        "caption": "Tmux: Open here (split horizontally)",
+        "command": "open_tmux",
+        "args": {
+            "split": "horizontal"
+        }
+    }
+]
