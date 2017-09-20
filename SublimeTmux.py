@@ -19,18 +19,25 @@ class TmuxCommand():
         else:
             return None
 
+    def check_tmux_status(self):
+        tmux_status = subprocess.Popen(['tmux', 'info'])
+        tmux_status.wait()
+
+        return tmux_status.returncode is 0
+
     def run_tmux(self, path, parameters, split):
         try:
-            args = ['tmux', 'split-window' if split else 'new-window']
+            if self.check_tmux_status():
+                args = ['tmux', 'split-window' if split else 'new-window']
 
-            if split == 'horizontal':
-                args.append('-h')
+                if split == 'horizontal':
+                    args.append('-h')
 
-            if path:
-                args.extend(['-c', path])
+                if path:
+                    args.extend(['-c', path])
 
-            args.extend(parameters)
-            subprocess.Popen(args)
+                args.extend(parameters)
+                subprocess.Popen(args)
         except (Exception) as exception:
             sublime.error_message('tmux: ' + str(exception))
 
