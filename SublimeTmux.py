@@ -54,14 +54,14 @@ class TmuxCommand():
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, parameters=[], split=None):
+    def run(self, path=None, split=None):
         path = self.resolve_file_path(path)
 
-        self.run_tmux(path, parameters, split)
+        self.run_tmux(path, [], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, parameters=[], split=None):
+    def run(self, path=None, split=None):
         path = self.resolve_file_path(path)
         folders = [x for x in self.window.folders() if path.find(x + os.sep) == 0][0:1]
 
-        self.run_tmux(folders[0], parameters, split)
+        self.run_tmux(folders[0], [], split)
