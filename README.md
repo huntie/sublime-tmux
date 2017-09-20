@@ -1,4 +1,4 @@
-# Sublime tmux
+# SublimeTmux
 
 Commands to open [tmux](https://github.com/tmux/tmux#readme) windows at the current file or root project folder in [Sublime Text](https://www.sublimetext.com/).
 
