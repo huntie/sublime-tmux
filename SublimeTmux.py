@@ -3,6 +3,18 @@ import sublime_plugin
 import os
 import re
 import subprocess
+import sys
+
+def get_setting(key, default=None):
+    settings = sublime.load_settings('SublimeTmux.sublime-settings')
+    os_specific_settings = {}
+
+    if sys.platform == 'darwin':
+        os_specific_settings = sublime.load_settings('SublimeTmux (OSX).sublime-settings')
+    else:
+        os_specific_settings = sublime.load_settings('SublimeTmux (Linux).sublime-settings')
+
+    return os_specific_settings.get(key, settings.get(key, default))
 
 class TmuxCommand():
     def resolve_file_path(self, path):
