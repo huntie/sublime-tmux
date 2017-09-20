@@ -3,6 +3,18 @@ import sublime_plugin
 import os
 import re
 import subprocess
+import sys
+
+def get_setting(key, default=None):
+    settings = sublime.load_settings('SublimeTmux.sublime-settings')
+    os_specific_settings = {}
+
+    if sys.platform == 'darwin':
+        os_specific_settings = sublime.load_settings('SublimeTmux (OSX).sublime-settings')
+    else:
+        os_specific_settings = sublime.load_settings('SublimeTmux (Linux).sublime-settings')
+
+    return os_specific_settings.get(key, settings.get(key, default))
 
 class TmuxCommand():
     def resolve_file_path(self, path):
@@ -42,14 +54,19 @@ class TmuxCommand():
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, parameters=[], split=None):
+    def run(self, path=None, split=None):
         path = self.resolve_file_path(path)
 
-        self.run_tmux(path, parameters, split)
+        self.run_tmux(path, [], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, parameters=[], split=None):
+    def run(self, path=None, split=None):
         path = self.resolve_file_path(path)
         folders = [x for x in self.window.folders() if path.find(x + os.sep) == 0][0:1]
+        path = folders[0]
+        parameters=[]
 
-        self.run_tmux(folders[0], parameters, split)
+        if get_setting('set_project_window_name', True):
+            parameters.extend(['-n', path.split(os.sep)[-1]])
+
+        self.run_tmux(path, parameters, split)
