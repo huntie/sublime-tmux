@@ -8,7 +8,7 @@ Soon to be available on [Package Control](https://packagecontrol.io/). Until the
 
 ## Usage
 
-For now, *sublime-tmux* requires a your local tmux server to be running. In practice this means it will only run actions whilst you have an open tmux session in your terminal emulator.
+For now, *SublimeTmux* requires a local tmux server to be running. In practice this means it will only run actions whilst you have an open tmux session in your terminal emulator.
 
 Once installed, a number of tmux-related commands are available in the Command Palette, activated with *ctrl*+*shift*+*p*:
 
@@ -26,13 +26,21 @@ Open a new tmux window at the directory of the current file.
 
 Open a new tmux window at the current root project directory.
 
-### Arguments
+### Command arguments
 
 These properties may be set as part of the `args` object for any command.
 
-#### `split` (str)
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| **`split`** | `string`  | `null` | If set, a new pane in the current window will be opened. The direction of the split can be set to either `"horizontal"` or `"vertical"` (default). |
 
-If set, a new pane in the current window will be opened. The direction of the split can be set to either `"horizontal"` or `"vertical"` (default).
+### Package settings
+
+Default, user-level and OS-specific settings files can be accessed under **Preferences > Package Settings > SublimeTmux**.
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| **`set_project_window_name`** | `bool`  | `true` | Set whether new windows created with `open_tmux_project_folder` should be created with their name set to that of the directory opened. This is useful to identify multiple window tabs across projects. |
 
 ## Contributing
 

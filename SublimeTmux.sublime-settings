@@ -1,0 +1,5 @@
+{
+    // Set whether new windows created with `open_tmux_project_folder` should
+    // be created with their name set to that of the directory opened.
+    "set_project_window_name": true
+}
