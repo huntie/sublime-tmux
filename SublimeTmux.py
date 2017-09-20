@@ -63,5 +63,10 @@ class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
     def run(self, path=None, split=None):
         path = self.resolve_file_path(path)
         folders = [x for x in self.window.folders() if path.find(x + os.sep) == 0][0:1]
+        path = folders[0]
+        parameters=[]
 
-        self.run_tmux(folders[0], [], split)
+        if get_setting('set_project_window_name', True):
+            parameters.extend(['-n', path.split(os.sep)[-1]])
+
+        self.run_tmux(path, parameters, split)
