@@ -1,5 +1,6 @@
 import sublime
 import sublime_plugin
+import io
 import os
 import re
 import subprocess
@@ -36,6 +37,16 @@ class TmuxCommand():
         tmux_status.wait()
 
         return tmux_status.returncode is 0
+
+    def get_active_tmux_sessions(self):
+        sessions = subprocess.Popen(['tmux', 'list-sessions'], stdout=subprocess.PIPE)
+        active_sessions = {}
+
+        for line in io.TextIOWrapper(sessions.stdout, encoding='utf-8'):
+            if line.endswith('(attached)' + os.linesep):
+                active_sessions[line.split(':')[0]] = line.split(' (')[0]
+
+        return active_sessions
 
     def run_tmux(self, path, parameters, split):
         try:
