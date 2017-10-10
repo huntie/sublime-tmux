@@ -40,28 +40,51 @@ class TmuxCommand():
 
     def get_active_tmux_sessions(self):
         sessions = subprocess.Popen(['tmux', 'list-sessions'], stdout=subprocess.PIPE)
-        active_sessions = {}
+        active_sessions = []
 
         for line in io.TextIOWrapper(sessions.stdout, encoding='utf-8'):
             if line.endswith('(attached)' + os.linesep):
-                active_sessions[line.split(':')[0]] = line.split(' (')[0]
+                active_sessions.append(line)
 
         return active_sessions
+
+    def format_session_choices(self, sessions):
+        return list(map(lambda x: x.split(' (')[0], sessions))
+
+    def on_session_selected(self, index):
+        if index == -1:
+            return
+
+        self.command_args.extend(['-t', self.active_sessions[index].split(':')[0] + ':'])
+        self.execute()
 
     def run_tmux(self, path, parameters, split):
         try:
             if self.check_tmux_status():
-                args = ['tmux', 'split-window' if split else 'new-window']
+                self.active_sessions = self.get_active_tmux_sessions()
+                self.command_args = ['tmux', 'split-window' if split else 'new-window']
+                self.command_args.extend(parameters)
 
                 if split == 'horizontal':
-                    args.append('-h')
+                    self.command_args.append('-h')
 
                 if path:
-                    args.extend(['-c', path])
+                    self.command_args.extend(['-c', path])
 
-                args.extend(parameters)
-                subprocess.Popen(args)
-        except (Exception) as exception:
+                if len(self.active_sessions) > 1:
+                    return self.window.show_quick_panel(
+                        self.format_session_choices(self.active_sessions),
+                        self.on_session_selected
+                    )
+
+                self.execute()
+        except Exception as exception:
+            sublime.error_message('tmux: ' + str(exception))
+
+    def execute(self):
+        try:
+            subprocess.Popen(self.command_args)
+        except Exception as exception:
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
