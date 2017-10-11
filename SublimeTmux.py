@@ -1,5 +1,7 @@
 import sublime
 import sublime_plugin
+from datetime import datetime
+import io
 import os
 import re
 import subprocess
@@ -37,20 +39,61 @@ class TmuxCommand():
 
         return tmux_status.returncode is 0
 
+    def get_active_tmux_sessions(self):
+        parts = ['name', 'windows', 'created', 'attached', 'width', 'height']
+        list_sessions = subprocess.Popen([
+            'tmux',
+            'list-sessions',
+            '-F',
+            '#{session_' + '} #{session_'.join(parts) + '}'
+        ], stdout=subprocess.PIPE)
+
+        return [dict(zip(parts, line.strip().split(' '))) for line in io.TextIOWrapper(list_sessions.stdout)]
+
+    def format_session_choices(self, sessions):
+        return list(map(
+            lambda session: [
+                '{}: {} window{}'.format(session['name'], session['windows'], 's'[int(session['windows']) == 1:]),
+                '{:%c}'.format(datetime.fromtimestamp(int(session['created']))),
+                '{}x{}{}'.format(session['width'], session['height'], ' (attached)' if int(session['attached']) else '')
+            ],
+            sessions
+        ))
+
+    def on_session_selected(self, index):
+        if index == -1:
+            return
+
+        self.command_args.extend(['-t', self.attached_sessions[index]['name'] + ':'])
+        self.execute()
+
     def run_tmux(self, path, parameters, split):
         try:
             if self.check_tmux_status():
-                args = ['tmux', 'split-window' if split else 'new-window']
+                self.attached_sessions = list(filter(lambda x: int(x['attached']), self.get_active_tmux_sessions()))
+                self.command_args = ['tmux', 'split-window' if split else 'new-window']
+                self.command_args.extend(parameters)
 
                 if split == 'horizontal':
-                    args.append('-h')
+                    self.command_args.append('-h')
 
                 if path:
-                    args.extend(['-c', path])
+                    self.command_args.extend(['-c', path])
 
-                args.extend(parameters)
-                subprocess.Popen(args)
-        except (Exception) as exception:
+                if len(self.attached_sessions) > 1:
+                    return self.window.show_quick_panel(
+                        self.format_session_choices(self.attached_sessions),
+                        self.on_session_selected
+                    )
+
+                self.execute()
+        except Exception as exception:
+            sublime.error_message('tmux: ' + str(exception))
+
+    def execute(self):
+        try:
+            subprocess.Popen(self.command_args)
+        except Exception as exception:
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
