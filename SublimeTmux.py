@@ -1,5 +1,6 @@
 import sublime
 import sublime_plugin
+from datetime import datetime
 import io
 import os
 import re
@@ -39,29 +40,37 @@ class TmuxCommand():
         return tmux_status.returncode is 0
 
     def get_active_tmux_sessions(self):
-        sessions = subprocess.Popen(['tmux', 'list-sessions'], stdout=subprocess.PIPE)
-        active_sessions = []
+        parts = ['name', 'windows', 'created', 'attached', 'width', 'height']
+        list_sessions = subprocess.Popen([
+            'tmux',
+            'list-sessions',
+            '-F',
+            '#{session_' + '} #{session_'.join(parts) + '}'
+        ], stdout=subprocess.PIPE)
 
-        for line in io.TextIOWrapper(sessions.stdout, encoding='utf-8'):
-            if line.endswith('(attached)' + os.linesep):
-                active_sessions.append(line)
-
-        return active_sessions
+        return [dict(zip(parts, line.strip().split(' '))) for line in io.TextIOWrapper(list_sessions.stdout)]
 
     def format_session_choices(self, sessions):
-        return list(map(lambda x: x.split(' (')[0], sessions))
+        return list(map(
+            lambda session: [
+                '{}: {} window{}'.format(session['name'], session['windows'], 's'[int(session['windows']) == 1:]),
+                '{:%c}'.format(datetime.fromtimestamp(int(session['created']))),
+                '{}x{}{}'.format(session['width'], session['height'], ' (attached)' if int(session['attached']) else '')
+            ],
+            sessions
+        ))
 
     def on_session_selected(self, index):
         if index == -1:
             return
 
-        self.command_args.extend(['-t', self.active_sessions[index].split(':')[0] + ':'])
+        self.command_args.extend(['-t', self.attached_sessions[index]['name'] + ':'])
         self.execute()
 
     def run_tmux(self, path, parameters, split):
         try:
             if self.check_tmux_status():
-                self.active_sessions = self.get_active_tmux_sessions()
+                self.attached_sessions = list(filter(lambda x: int(x['attached']), self.get_active_tmux_sessions()))
                 self.command_args = ['tmux', 'split-window' if split else 'new-window']
                 self.command_args.extend(parameters)
 
@@ -71,9 +80,9 @@ class TmuxCommand():
                 if path:
                     self.command_args.extend(['-c', path])
 
-                if len(self.active_sessions) > 1:
+                if len(self.attached_sessions) > 1:
                     return self.window.show_quick_panel(
-                        self.format_session_choices(self.active_sessions),
+                        self.format_session_choices(self.attached_sessions),
                         self.on_session_selected
                     )
 
