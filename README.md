@@ -1,4 +1,4 @@
-# SublimeTmux
+# Sublime tmux
 
 Commands to open [tmux](https://github.com/tmux/tmux#readme) windows at the current file or root project folder in [Sublime Text](https://www.sublimetext.com/).
 
@@ -8,7 +8,7 @@ Soon to be available on [Package Control](https://packagecontrol.io/). Until the
 
 ## Usage
 
-For now, *SublimeTmux* requires a local tmux server to be running. In practice this means it will only run actions whilst you have an open tmux session in your terminal emulator.
+For now, *Sublime tmux* requires a local tmux server to be running. In practice this means it will only run actions whilst you have an open tmux session in your terminal emulator.
 
 Once installed, a number of tmux-related commands are available in the Command Palette, activated with *ctrl*+*shift*+*p*:
 
