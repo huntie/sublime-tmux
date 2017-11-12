@@ -8,13 +8,13 @@ import subprocess
 import sys
 
 def get_setting(key, default=None):
-    settings = sublime.load_settings('SublimeTmux.sublime-settings')
+    settings = sublime.load_settings('tmux.sublime-settings')
     os_specific_settings = {}
 
     if sys.platform == 'darwin':
-        os_specific_settings = sublime.load_settings('SublimeTmux (OSX).sublime-settings')
+        os_specific_settings = sublime.load_settings('tmux (OSX).sublime-settings')
     else:
-        os_specific_settings = sublime.load_settings('SublimeTmux (Linux).sublime-settings')
+        os_specific_settings = sublime.load_settings('tmux (Linux).sublime-settings')
 
     return os_specific_settings.get(key, settings.get(key, default))
 

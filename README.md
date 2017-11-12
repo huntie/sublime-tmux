@@ -36,7 +36,7 @@ These properties may be set as part of the `args` object for any command.
 
 ### Package settings
 
-Default, user-level and OS-specific settings files can be accessed under **Preferences > Package Settings > SublimeTmux**.
+Default, user-level and OS-specific settings files can be accessed under **Preferences > Package Settings > tmux**.
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
