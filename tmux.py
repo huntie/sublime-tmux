@@ -19,19 +19,19 @@ def get_setting(key, default=None):
     return os_specific_settings.get(key, settings.get(key, default))
 
 class TmuxCommand():
-    def resolve_file_path(self, path):
-        if path:
-            return path
-        elif self.window.active_view().file_name():
+    def resolve_file_path(self):
+        if self.window.active_view().file_name():
             return re.sub(
                 re.compile('{0}[^{0}]+$'.format(os.sep)),
                 os.sep,
                 self.window.active_view().file_name()
             )
-        elif self.window.folders():
+        elif len(self.window.folders()):
             return self.window.folders()[0]
         else:
-            return None
+            sublime.status_message('tmux: Could not resolve file path - opening at home directory')
+
+            return '~/'
 
     def check_tmux_status(self):
         tmux_status = subprocess.Popen(['tmux', 'info'])
@@ -98,18 +98,24 @@ class TmuxCommand():
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
     def run(self, path=None, split=None):
-        path = self.resolve_file_path(path)
+        if not path:
+            path = self.resolve_file_path()
 
         self.run_tmux(path, [], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
     def run(self, path=None, split=None):
-        path = self.resolve_file_path(path)
-        folders = [x for x in self.window.folders() if path.find(x + os.sep) == 0][0:1]
-        path = folders[0]
         parameters=[]
 
-        if get_setting('set_project_window_name', True):
-            parameters.extend(['-n', path.split(os.sep)[-1]])
+        if not path:
+            path = self.resolve_file_path()
+
+        matched_folders = [x for x in self.window.folders() if path.find(x) == 0]
+
+        if len(matched_folders):
+            path = matched_folders[0]
+
+            if get_setting('set_project_window_name', True):
+                parameters.extend(['-n', path.split(os.sep)[-1]])
 
         self.run_tmux(path, parameters, split)
