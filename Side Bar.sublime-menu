@@ -1,0 +1,31 @@
+[
+    {
+        "caption": "-"
+    },
+    {
+        "id": "side-bar-files-open-with"
+    },
+    {
+        "caption": "Open in tmux",
+        "children": [
+            {
+                "caption": "New window",
+                "command": "open_tmux"
+            },
+            {
+                "caption": "New pane (split vertically)",
+                "command": "open_tmux",
+                "args": {
+                    "split": "vertical"
+                }
+            },
+            {
+                "caption": "New pane (split horizontally)",
+                "command": "open_tmux",
+                "args": {
+                    "split": "horizontal"
+                }
+            }
+        ]
+    }
+]
