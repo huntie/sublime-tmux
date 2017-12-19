@@ -21,11 +21,7 @@ def get_setting(key, default=None):
 class TmuxCommand():
     def resolve_file_path(self):
         if self.window.active_view().file_name():
-            return re.sub(
-                re.compile('{0}[^{0}]+$'.format(os.sep)),
-                os.sep,
-                self.window.active_view().file_name()
-            )
+            return os.path.dirname(self.window.active_view().file_name())
         elif len(self.window.folders()):
             return self.window.folders()[0]
         else:
