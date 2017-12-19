@@ -100,12 +100,9 @@ class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
         self.run_tmux(path, [], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, split=None):
+    def run(self, split=None):
         parameters=[]
-
-        if not path:
-            path = self.resolve_file_path()
-
+        path = self.resolve_file_path()
         matched_folders = [x for x in self.window.folders() if path.find(x) == 0]
 
         if len(matched_folders):
