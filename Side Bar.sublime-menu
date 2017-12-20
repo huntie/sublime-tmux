@@ -10,12 +10,16 @@
         "children": [
             {
                 "caption": "New window",
-                "command": "open_tmux"
+                "command": "open_tmux",
+                "args": {
+                    "paths": []
+                }
             },
             {
                 "caption": "New pane (split vertically)",
                 "command": "open_tmux",
                 "args": {
+                    "paths": [],
                     "split": "vertical"
                 }
             },
@@ -23,6 +27,7 @@
                 "caption": "New pane (split horizontally)",
                 "command": "open_tmux",
                 "args": {
+                    "paths": [],
                     "split": "horizontal"
                 }
             }

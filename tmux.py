@@ -63,7 +63,7 @@ class TmuxCommand():
         self.command_args.extend(['-t', self.attached_sessions[index]['name'] + ':'])
         self.execute()
 
-    def run_tmux(self, path, parameters, split):
+    def run_tmux(self, parameters, split):
         try:
             if self.check_tmux_status():
                 self.attached_sessions = list(filter(lambda x: int(x['attached']), self.get_active_tmux_sessions()))
@@ -72,9 +72,6 @@ class TmuxCommand():
 
                 if split == 'horizontal':
                     self.command_args.append('-h')
-
-                if path:
-                    self.command_args.extend(['-c', path])
 
                 if len(self.attached_sessions) > 1:
                     return self.window.show_quick_panel(
@@ -88,30 +85,31 @@ class TmuxCommand():
 
     def execute(self):
         try:
-            subprocess.Popen(self.command_args)
+            for path in self.paths:
+                subprocess.Popen(self.command_args + ['-c', path])
         except Exception as exception:
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, split=None):
-        if not path:
-            path = self.resolve_file_path()
+    def run(self, paths=[], split=None):
+        self.paths = [os.path.dirname(path) if not os.path.isdir(path) else path for path in paths]
 
-        self.run_tmux(path, [], split)
+        if not len(self.paths):
+            self.paths.append(self.resolve_file_path())
+
+        self.run_tmux([], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, split=None):
+    def run(self, split=None):
         parameters=[]
+        path = self.resolve_file_path()
+        matched_dirs = [x for x in self.window.folders() if path.find(x) == 0]
 
-        if not path:
-            path = self.resolve_file_path()
-
-        matched_folders = [x for x in self.window.folders() if path.find(x) == 0]
-
-        if len(matched_folders):
-            path = matched_folders[0]
+        if len(matched_dirs):
+            path = matched_dirs[0]
 
             if get_setting('set_project_window_name', True):
                 parameters.extend(['-n', path.split(os.sep)[-1]])
 
-        self.run_tmux(path, parameters, split)
+        self.paths = [path]
+        self.run_tmux(parameters, split)
