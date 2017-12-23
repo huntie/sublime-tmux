@@ -1,4 +1,11 @@
 {
+    // Set how the active window layout should be updated each time after
+    // opening a split pane. A value of "even" will evenly distribute all panes
+    // in the direction opened. "tiled" or `true` will distribute all panes as
+    // evenly as possible in both rows and columns. Leave `false` to take no
+    // action.
+    "arrange_panes_on_split": false,
+
     // Set whether new windows created with `open_tmux_project_folder` should
     // be created with their name set to that of the directory opened.
     "set_project_window_name": true

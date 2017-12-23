@@ -21,11 +21,7 @@ def get_setting(key, default=None):
 class TmuxCommand():
     def resolve_file_path(self):
         if self.window.active_view().file_name():
-            return re.sub(
-                re.compile('{0}[^{0}]+$'.format(os.sep)),
-                os.sep,
-                self.window.active_view().file_name()
-            )
+            return os.path.dirname(self.window.active_view().file_name())
         elif len(self.window.folders()):
             return self.window.folders()[0]
         else:
@@ -50,6 +46,19 @@ class TmuxCommand():
 
         return [dict(zip(parts, line.strip().split(' '))) for line in io.TextIOWrapper(list_sessions.stdout)]
 
+    def update_window_layout(self):
+        args = ['tmux', 'select-layout']
+
+        if get_setting('arrange_panes_on_split') == 'even':
+            args.append('even-' + ('horizontal' if '-h' in self.command_args else 'vertical'))
+        else:
+            args.append('tiled')
+
+        if '-t' in self.command_args:
+            args.extend(['-t', self.command_args[self.command_args.index('-t') + 1]])
+
+        subprocess.Popen(args)
+
     def format_session_choices(self, sessions):
         return list(map(
             lambda session: [
@@ -67,7 +76,7 @@ class TmuxCommand():
         self.command_args.extend(['-t', self.attached_sessions[index]['name'] + ':'])
         self.execute()
 
-    def run_tmux(self, path, parameters, split):
+    def run_tmux(self, parameters, split):
         try:
             if self.check_tmux_status():
                 self.attached_sessions = list(filter(lambda x: int(x['attached']), self.get_active_tmux_sessions()))
@@ -76,9 +85,6 @@ class TmuxCommand():
 
                 if split == 'horizontal':
                     self.command_args.append('-h')
-
-                if path:
-                    self.command_args.extend(['-c', path])
 
                 if len(self.attached_sessions) > 1:
                     return self.window.show_quick_panel(
@@ -92,30 +98,35 @@ class TmuxCommand():
 
     def execute(self):
         try:
-            subprocess.Popen(self.command_args)
+            for path in self.paths:
+                subprocess.Popen(self.command_args + ['-c', path])
+
+            if 'split-window' in self.command_args and get_setting('arrange_panes_on_split'):
+                self.update_window_layout()
+
         except Exception as exception:
             sublime.error_message('tmux: ' + str(exception))
 
 class OpenTmuxCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, split=None):
-        if not path:
-            path = self.resolve_file_path()
+    def run(self, paths=[], split=None):
+        self.paths = [os.path.dirname(path) if not os.path.isdir(path) else path for path in paths]
 
-        self.run_tmux(path, [], split)
+        if not len(self.paths):
+            self.paths.append(self.resolve_file_path())
+
+        self.run_tmux([], split)
 
 class OpenTmuxProjectFolderCommand(sublime_plugin.WindowCommand, TmuxCommand):
-    def run(self, path=None, split=None):
+    def run(self, split=None):
         parameters=[]
+        path = self.resolve_file_path()
+        matched_dirs = [x for x in self.window.folders() if path.find(x) == 0]
 
-        if not path:
-            path = self.resolve_file_path()
-
-        matched_folders = [x for x in self.window.folders() if path.find(x) == 0]
-
-        if len(matched_folders):
-            path = matched_folders[0]
+        if len(matched_dirs):
+            path = matched_dirs[0]
 
             if get_setting('set_project_window_name', True):
                 parameters.extend(['-n', path.split(os.sep)[-1]])
 
-        self.run_tmux(path, parameters, split)
+        self.paths = [path]
+        self.run_tmux(parameters, split)
