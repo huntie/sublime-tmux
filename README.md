@@ -40,6 +40,7 @@ Default, user-level and OS-specific settings files can be accessed under **Prefe
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
+| **`arrange_panes_on_split`** | `bool\|string` | `false` | Set how the active window layout should be updated each time after opening a split pane. A value of `"even"` will evenly distribute all panes in the direction opened. `"tiled"` or `true` will distribute all panes as evenly as possible in both rows and columns. Leave `false` to take no action. |
 | **`set_project_window_name`** | `bool`  | `true` | Set whether new windows created with `open_tmux_project_folder` should be created with their name set to that of the directory opened. This is useful to identify multiple window tabs across projects. |
 
 ## Contributing
