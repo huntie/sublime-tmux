@@ -46,6 +46,19 @@ class TmuxCommand():
 
         return [dict(zip(parts, line.strip().split(' '))) for line in io.TextIOWrapper(list_sessions.stdout)]
 
+    def update_window_layout(self):
+        args = ['tmux', 'select-layout']
+
+        if get_setting('arrange_panes_on_split') == 'even':
+            args.append('even-' + ('horizontal' if '-h' in self.command_args else 'vertical'))
+        else:
+            args.append('tiled')
+
+        if '-t' in self.command_args:
+            args.extend(['-t', self.command_args[self.command_args.index('-t') + 1]])
+
+        subprocess.Popen(args)
+
     def format_session_choices(self, sessions):
         return list(map(
             lambda session: [
@@ -87,6 +100,10 @@ class TmuxCommand():
         try:
             for path in self.paths:
                 subprocess.Popen(self.command_args + ['-c', path])
+
+            if 'split-window' in self.command_args and get_setting('arrange_panes_on_split'):
+                self.update_window_layout()
+
         except Exception as exception:
             sublime.error_message('tmux: ' + str(exception))
 
