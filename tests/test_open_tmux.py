@@ -38,6 +38,22 @@ class TestOpenTmuxCommand(snapshottest.TestCase):
 
         self.assertMatchSnapshot(self.subproc_popen_mock.call_args[0])
 
+    def test_run_with_paths_argument(self):
+        sublime.active_window().run_command('open_tmux', {'paths': ['~/example-project/tests/snapshots']})
+
+        self.assertMatchSnapshot(self.subproc_popen_mock.call_args[0])
+
+    def test_run_with_paths_argument_multiple(self):
+        with mock.patch('os.path.isdir') as os_isdir_mock:
+            os_isdir_mock.side_effect = [True, False]
+            sublime.active_window().run_command('open_tmux', {'paths': [
+                '~/example-project/docs',
+                '~/example-project/tests/test.py'
+            ]})
+
+        self.assertEqual(self.subproc_popen_mock.call_count, 4)
+        self.assertMatchSnapshot([args[0] for args in self.subproc_popen_mock.call_args_list[-2:]])
+
     def test_run_split_vertical(self):
         with mock.patch('os.path.dirname') as os_dirname_mock:
             os_dirname_mock.return_value = '~/example-project/src'
