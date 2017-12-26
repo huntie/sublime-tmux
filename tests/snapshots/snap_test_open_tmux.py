@@ -12,7 +12,7 @@ snapshots['TestOpenTmuxCommand::test_run_current_file 1'] = (
         'tmux',
         'new-window',
         '-c',
-        '~/example-project/src'
+        '/home/user/example-project/src'
     ]
 )
 
@@ -22,7 +22,7 @@ snapshots['TestOpenTmuxCommand::test_run_split_horizontal 1'] = (
         'split-window',
         '-h',
         '-c',
-        '~/example-project/src'
+        '/home/user/example-project/src'
     ]
 )
 
@@ -31,7 +31,25 @@ snapshots['TestOpenTmuxCommand::test_run_split_vertical 1'] = (
         'tmux',
         'split-window',
         '-c',
-        '~/example-project/src'
+        '/home/user/example-project/src'
+    ]
+)
+
+snapshots['TestOpenTmuxCommand::test_run_unsaved_file_inside_project 1'] = (
+    [
+        'tmux',
+        'new-window',
+        '-c',
+        '/home/user/example-project'
+    ]
+)
+
+snapshots['TestOpenTmuxCommand::test_run_unsaved_file_outside_project 1'] = (
+    [
+        'tmux',
+        'new-window',
+        '-c',
+        '/home/user'
     ]
 )
 
@@ -40,7 +58,7 @@ snapshots['TestOpenTmuxCommand::test_run_with_paths_argument 1'] = (
         'tmux',
         'new-window',
         '-c',
-        '~/example-project/tests'
+        '/home/user/example-project/tests'
     ]
 )
 
@@ -50,7 +68,7 @@ snapshots['TestOpenTmuxCommand::test_run_with_paths_argument_multiple 1'] = [
             'tmux',
             'new-window',
             '-c',
-            '~/example-project/docs'
+            '/home/user/example-project/docs'
         ]
     ),
     (
@@ -58,7 +76,7 @@ snapshots['TestOpenTmuxCommand::test_run_with_paths_argument_multiple 1'] = [
             'tmux',
             'new-window',
             '-c',
-            '~/example-project/tests'
+            '/home/user/example-project/tests'
         ]
     )
 ]
