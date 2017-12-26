@@ -16,6 +16,24 @@ snapshots['TestOpenTmuxCommand::test_run_current_file 1'] = (
     ]
 )
 
+snapshots['TestOpenTmuxCommand::test_run_split_arrange_tiled 1'] = [
+    (
+        [
+            'tmux',
+            'split-window',
+            '-c',
+            '/home/user/example-project/src'
+        ]
+    ),
+    (
+        [
+            'tmux',
+            'select-layout',
+            'tiled'
+        ]
+    )
+]
+
 snapshots['TestOpenTmuxCommand::test_run_split_horizontal 1'] = (
     [
         'tmux',
@@ -26,6 +44,25 @@ snapshots['TestOpenTmuxCommand::test_run_split_horizontal 1'] = (
     ]
 )
 
+snapshots['TestOpenTmuxCommand::test_run_split_horizontal_even 1'] = [
+    (
+        [
+            'tmux',
+            'split-window',
+            '-h',
+            '-c',
+            '/home/user/example-project/src'
+        ]
+    ),
+    (
+        [
+            'tmux',
+            'select-layout',
+            'even-horizontal'
+        ]
+    )
+]
+
 snapshots['TestOpenTmuxCommand::test_run_split_vertical 1'] = (
     [
         'tmux',
@@ -34,6 +71,24 @@ snapshots['TestOpenTmuxCommand::test_run_split_vertical 1'] = (
         '/home/user/example-project/src'
     ]
 )
+
+snapshots['TestOpenTmuxCommand::test_run_split_vertical_even 1'] = [
+    (
+        [
+            'tmux',
+            'split-window',
+            '-c',
+            '/home/user/example-project/src'
+        ]
+    ),
+    (
+        [
+            'tmux',
+            'select-layout',
+            'even-vertical'
+        ]
+    )
+]
 
 snapshots['TestOpenTmuxCommand::test_run_unsaved_file_inside_project 1'] = (
     [

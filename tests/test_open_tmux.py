@@ -93,3 +93,33 @@ class TestOpenTmuxCommand(snapshottest.TestCase):
             sublime.active_window().run_command('open_tmux', { 'split': 'horizontal' })
 
         self.assertMatchSnapshot(self.subproc_popen_mock.call_args[0])
+
+    @mock.patch('sublime.load_settings')
+    def test_run_split_vertical_even(self, mock_load_settings):
+        mock_load_settings.return_value = {'arrange_panes_on_split': 'even'}
+
+        with mock.patch('os.path.dirname') as os_dirname_mock:
+            os_dirname_mock.return_value = '/home/user/example-project/src'
+            sublime.active_window().run_command('open_tmux', { 'split': 'vertical' })
+
+        self.assertMatchSnapshot([args[0] for args in self.subproc_popen_mock.call_args_list[-2:]])
+
+    @mock.patch('sublime.load_settings')
+    def test_run_split_horizontal_even(self, mock_load_settings):
+        mock_load_settings.return_value = {'arrange_panes_on_split': 'even'}
+
+        with mock.patch('os.path.dirname') as os_dirname_mock:
+            os_dirname_mock.return_value = '/home/user/example-project/src'
+            sublime.active_window().run_command('open_tmux', { 'split': 'horizontal' })
+
+        self.assertMatchSnapshot([args[0] for args in self.subproc_popen_mock.call_args_list[-2:]])
+
+    @mock.patch('sublime.load_settings')
+    def test_run_split_arrange_tiled(self, mock_load_settings):
+        mock_load_settings.return_value = {'arrange_panes_on_split': 'tiled'}
+
+        with mock.patch('os.path.dirname') as os_dirname_mock:
+            os_dirname_mock.return_value = '/home/user/example-project/src'
+            sublime.active_window().run_command('open_tmux', { 'split': 'vertical' })
+
+        self.assertMatchSnapshot([args[0] for args in self.subproc_popen_mock.call_args_list[-2:]])
