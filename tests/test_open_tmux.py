@@ -1,32 +1,13 @@
 import sublime
-import io
 from unittest import mock
 import snapshottest
 
-def mock_process_call(attrs):
-    process_mock = mock.Mock()
-    process_mock.configure_mock(**attrs)
-
-    return process_mock
-
-def mock_tmux_subproc_calls():
-    # `tmux info`
-    yield mock_process_call({'returncode': 0})
-
-    # `tmux list-sessions`
-    yield mock_process_call({
-        'returncode': 0,
-        'stdout': io.BufferedReader(io.BytesIO(b'0 1 1513966319 1 150 34\n'))
-    })
-
-    # Later commands
-    while True:
-        yield mock_process_call({'returncode': 0})
+from helpers import mock_tmux_subproc_events
 
 class TestOpenTmuxCommand(snapshottest.TestCase):
     def setUp(self):
         self.subproc_popen_mock = mock.patch('subprocess.Popen').start()
-        self.subproc_popen_mock.side_effect = mock_tmux_subproc_calls()
+        self.subproc_popen_mock.side_effect = mock_tmux_subproc_events()
 
     def tearDown(self):
         mock.patch.stopall()
@@ -64,8 +45,8 @@ class TestOpenTmuxCommand(snapshottest.TestCase):
             ]
             sublime.active_window().run_command('open_tmux')
 
+        view.window().run_command('close_file')
         self.assertMatchSnapshot(self.subproc_popen_mock.call_args[0])
-        view.window().run_command("close_file")
 
     def test_run_unsaved_file_outside_project(self):
         view = sublime.active_window().new_file()
@@ -77,8 +58,8 @@ class TestOpenTmuxCommand(snapshottest.TestCase):
                 home_dir_mock.return_value = '/home/user'
                 sublime.active_window().run_command('open_tmux')
 
+        view.window().run_command('close_file')
         self.assertMatchSnapshot(self.subproc_popen_mock.call_args[0])
-        view.window().run_command("close_file")
 
     def test_run_split_vertical(self):
         with mock.patch('os.path.dirname') as os_dirname_mock:
