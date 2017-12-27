@@ -27,7 +27,7 @@ class TmuxCommand():
         else:
             sublime.status_message('tmux: Could not resolve file path - opening at home directory')
 
-            return '~/'
+            return os.path.expanduser('~')
 
     def check_tmux_status(self):
         tmux_status = subprocess.Popen(['tmux', 'info'])
