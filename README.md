@@ -4,13 +4,13 @@ Commands to open [tmux](https://github.com/tmux/tmux#readme) windows at the curr
 
 ## Installation
 
-Soon to be available on [Package Control](https://packagecontrol.io/). Until then, place this repository in your `Packages/` directory.
+Available as [tmux](https://packagecontrol.io/packages/tmux) on [Package Control](https://packagecontrol.io/) – install using the *Package Control: Install Package* command from the Command Palette. Alternatively, place this repository in your `Packages/` directory.
 
 ## Usage
 
 For now, *Sublime tmux* requires a local tmux server to be running. In practice this means it will only run actions whilst you have an open tmux session in your terminal emulator.
 
-Once installed, a number of tmux-related commands are available in the Command Palette, activated with *ctrl*+*shift*+*p*:
+Once installed, a number of tmux-related commands are available in the Command Palette, activated with *Ctrl*+*Shift*+*P*:
 
 <img src="./screenshots/command-palette.png" width="555" alt="tmux commands in the Command Palette">
 
